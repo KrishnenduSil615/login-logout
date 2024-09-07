@@ -63,6 +63,7 @@ function Register() {
         {
           method: 'POST',
           body: JSON.stringify({
+            name: registerData.name,
             email: registerData.email,
             password: registerData.password,
             returnSecureToken: true,
