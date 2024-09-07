@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 function Register() {
   const [name, setName] = useState('');
@@ -58,23 +58,37 @@ function Register() {
 
   async function addRegisterData(registerData) {
     try {
-      const response = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBD9-9u9pvywmAD7H6yZmlRWkpK2ZfOVEA', {
-        method: 'POST',
-        body: JSON.stringify(registerData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBD9-9u9pvywmAD7H6yZmlRWkpK2ZfOVEA',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            email: registerData.email,
+            password: registerData.password,
+            returnSecureToken: true,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        let errorMessage = 'Authentication failed';
+        if (data && data.error && data.error.message) {
+          errorMessage = data.error.message;
+        }
+        alert(errorMessage);
+        throw new Error(errorMessage); // Re-throw to handle it in the calling function
       }
-
       const data = await response.json();
       console.log('Registration data:', data);
-    } catch (error) {
+    }
+
+    catch (error) {
       console.error('Error saving registration data:', error);
-      throw error; // Re-throw to handle it in the calling function
+      throw error; // Re-throw to propagate error to the calling function
     }
   }
 
@@ -142,6 +156,9 @@ function Register() {
             </div>
           </div>
         )}
+        <p className="text-center mt-4">
+          back to login page <Link to='/'>Login</Link>
+        </p>
       </div>
     </div>
   );
